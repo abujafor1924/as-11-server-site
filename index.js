@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello assingment Eleven");
+  res.send("Hello assingment Eleven from server");
 });
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.frl4ype.mongodb.net/?retryWrites=true&w=majority`;
@@ -29,7 +29,6 @@ async function run() {
     const dataCollection = client.db("dataStore").collection("products");
 
     // post data
-
     app.post("/product", async (req, res) => {
       const body = req.body;
       const result = await dataCollection.insertOne(body);
@@ -49,7 +48,6 @@ async function run() {
     });
 
     // put data
-
     app.put("/update-data/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
@@ -64,7 +62,6 @@ async function run() {
     });
 
     // delete data
-
     app.delete("/delete-data/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
