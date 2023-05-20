@@ -72,11 +72,7 @@ async function run() {
       res.send(result);
     });
 
-    // spesipic some id and data
     app.get("/some-data", async (req, res) => {
-      // const options = {
-      //   projection: { title: 1, price: 1, service_id: 1, img: 1 },
-      // };
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
