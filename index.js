@@ -109,7 +109,7 @@ async function run() {
 
     await client.db("admin").command({ ping: 1 });
     console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
+      "Pinged your deployment. You successfully connected to MongoDB! Server"
     );
   } finally {
     //     await client.close();
