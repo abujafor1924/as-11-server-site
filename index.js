@@ -95,12 +95,22 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/all-datas/:subCategory", async (req, res) => {
+    app.get("/getcategory", async (req, res) => {
       let query = {};
-      if (req.query?.subCategory) {
-        query = { subCategory: req.query.subCategory };
+      if (req?.query?.cat) {
+        const subCategory = req.query.cat;
+        query = { subCategory };
       }
       const result = await dataCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/sortData", async (req, res) => {
+      const sorts = req.query.sort === "accend" ? 1 : -1;
+      const result = await dataCollection
+        .find()
+        .sort({ price: sorts })
+        .toArray();
       res.send(result);
     });
 
