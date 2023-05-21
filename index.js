@@ -70,13 +70,33 @@ async function run() {
     });
 
     app.get("/some-data", async (req, res) => {
+      const sortprice = req.query.sort;
+      let sortDataPrice = {};
+      if (sortprice === "asc") {
+        sortDataPrice = { price: 1 };
+      } else if (sortprice === "desc") {
+        sortDataPrice = { price: -1 };
+      }
+
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
       }
-      const result = await dataCollection.find(query).toArray();
+      const result = await dataCollection
+        .find(query)
+        .sort(sortDataPrice)
+        .toArray();
       res.send(result);
     });
+
+    // app.get("/some-data", async (req, res) => {
+    //   let query = {};
+    //   if (req.query?.email) {
+    //     query = { email: req.query.email };
+    //   }
+    //   const result = await dataCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
     app.get("/getText/:text", async (req, res) => {
       const text = req.params.text;
@@ -102,18 +122,6 @@ async function run() {
         query = { subCategory };
       }
       const result = await dataCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    app.get("/sortData", async (req, res) => {
-      const sorts = req.query.sort === "accend" ? 1 : -1;
-      console.log(sorts);
-      const result = await dataCollection
-        .find()
-        .sort({
-          price: sorts,
-        })
-        .toArray();
       res.send(result);
     });
 
