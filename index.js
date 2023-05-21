@@ -107,9 +107,12 @@ async function run() {
 
     app.get("/sortData", async (req, res) => {
       const sorts = req.query.sort === "accend" ? 1 : -1;
+      console.log(sorts);
       const result = await dataCollection
         .find()
-        .sort({ price: sorts })
+        .sort({
+          price: sorts,
+        })
         .toArray();
       res.send(result);
     });
