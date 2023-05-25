@@ -1,6 +1,7 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 4000;
@@ -22,11 +23,42 @@ const client = new MongoClient(uri, {
   },
 });
 
+const verifyToken = (req, res, next) => {
+  // console.log("hitting jwt verify");
+
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: "unauthorized acces" });
+  }
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+    if (error) {
+      return res
+        .status(403)
+        .send({ error: true, message: "unauthorized acces" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+  // console.log("jwt", token);
+};
+
 async function run() {
   try {
     // await client.connect();
 
     const dataCollection = client.db("dataStore").collection("products");
+
+    // jwt token practice
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      // console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      // console.log({ token });
+      res.send({ token });
+    });
 
     // post data
     app.post("/product", async (req, res) => {
@@ -48,7 +80,7 @@ async function run() {
     });
 
     // put data
-    app.put("/update-data/:id", async (req, res) => {
+    app.patch("/update-data/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -69,7 +101,14 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/some-data", async (req, res) => {
+    app.get("/some-data", verifyToken, async (req, res) => {
+      const decoded = req.decoded;
+      if (decoded.email !== req.query.email) {
+        return res
+          .status(403)
+          .send({ error: 1, message: "don't access for your" });
+      }
+
       const sortprice = req.query.sort;
       let sortDataPrice = {};
       if (sortprice === "asc") {
